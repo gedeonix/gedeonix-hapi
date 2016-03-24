@@ -2,9 +2,9 @@
   "name": "gedeonix-hapi",
   "version": "0.0.1",
   "private": true,
-  "description": "Gedeonix",
+  "description": "Gedeonix Hapi",
   "author": "Przemysław Sołtan",
-  "license": "(c) Creative GIS Solutions",
+  "license": "MIT",
   "main": "server.js",
   "directories": {
     "test": "test"
@@ -13,10 +13,6 @@
     "start": "./node_modules/nodemon/bin/nodemon.js",
     "test": "./node_modules/lab/bin/lab -a code  -L -v",
     "test-cov-html": "./node_modules/lab/bin/lab -a code -t 80 -r html -o coverage.html"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@bitbucket.org:gedeonix/app.git"
   },
   "dependencies": {
     "bell": "7.3.0",

@@ -4,7 +4,7 @@ const Path = require('path');
 const Good = require('good');
 const Hapi = require('hapi');
 
-const routes = require('./routes');
+const routes = require('./app/routes');
 
 const internals = {};
 
@@ -29,7 +29,7 @@ const plugins = [
             ]
         }
     },
-    { register: require('./plugins/mongo-plugin'),
+    { register: require('./app/plugins/mongo-plugin'),
         options: {
             uri: 'mongodb://localhost/gedeonix-hapi',
             mongoose: {
@@ -39,9 +39,9 @@ const plugins = [
     },
     require('inert'),
     require('vision'),
-    require('./plugins/decorator-plugin'),
-    require('./plugins/auth-plugin'),
-    require('./plugins/swagger-plugin')
+    require('./app/plugins/decorator-plugin'),
+    require('./app/plugins/auth-plugin'),
+    require('./app/plugins/swagger-plugin')
 ];
 server.register(plugins, (err) => {
 
