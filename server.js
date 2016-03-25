@@ -21,15 +21,21 @@ const plugins = [
     { register: Good,
         options: {
             responsePayload: true,
-            reporters: [
-                {
-                    reporter: require('good-console'),
-                    events: { log: '*', response: '*', error: '*' }
-                }
-            ]
+            reporters: [{
+                reporter: require('good-console'),    // Log everything to console
+                events: { log: '*', request: '*' }
+            }, {
+                reporter: require('good-file'),       // Log 'debug' to debug_log.log
+                events: { log: 'debug' },
+                config: 'log/debug_log.log'
+            }, {
+                reporter: require('good-file'),       // Log 'error' to error_log.log
+                events: { log: 'error' },
+                config: 'log/error_log.log'
+            }]
         }
     },
-    { register: require('./app/plugins/mongo-plugin'),
+    { register: require('./app/core/plugins/mongo-plugin'),
         options: {
             uri: 'mongodb://localhost/gedeonix-hapi',
             mongoose: {
@@ -39,9 +45,9 @@ const plugins = [
     },
     require('inert'),
     require('vision'),
-    require('./app/plugins/decorator-plugin'),
-    require('./app/plugins/auth-plugin'),
-    require('./app/plugins/swagger-plugin')
+    require('./app/core/plugins/decorator-plugin'),
+    require('./app/core/plugins/auth-plugin'),
+    require('./app/core/plugins/swagger-plugin')
 ];
 server.register(plugins, (err) => {
 

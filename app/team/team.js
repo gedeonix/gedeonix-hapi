@@ -1,78 +1,21 @@
 'use strict';
 
-const Joi = require('joi');
+const mongoose = require('mongoose');
+const nameValidator = require('../core/validators/name-validator');
 
-const Team = require('./team-model');
+const schema = mongoose.Schema({
+    owner: { type: String, required: true },
+    name: { type: String, required: true, validate: nameValidator, trim: true },
+    shortName: { type: String, required: true },
+    description: { type: String },
+    created: { type: Date, default: Date.now },
+    updated: { type: Date },
+    removed: { type: Date }
+});
 
-/**
- * GET
- */
-exports.get = {
+schema.pre('save', (next) => {
+    this.updated = Date.now();
+    next();
+});
 
-    auth: 'session', tags: ['api', 'settings'], description: 'Get Team settings', notes: '...',
-    handler: (request, reply) => {
-
-        const team = request.auth.credentials.team;
-        const owner = request.auth.credentials.id;
-
-        console.log(request.auth.credentials);
-
-        //TODO
-
-        Team.findOne({ '_id': company, 'owner': owner, removed: { $exists: false } })
-            .execAsync().then((data) => {
-                return reply(data);
-            })
-            .catch((err) => {
-                return reply.badImplementation(err);
-            });
-    }
-
-};
-
-exports.updateMain = {
-    auth: 'session', tags: ['api', 'settings'], description: 'Edit main team settings',
-    validate: {
-        payload: {
-            __v: Joi.number().integer().required(),
-            _id: Joi.string().required(),
-            name: Joi.string(),
-            description: Joi.string().allow('')
-        }
-    },
-    handler: (request, reply) => {
-
-        const company = request.auth.credentials.company;
-        const owner = request.auth.credentials.id;
-
-        const model = request.payload;
-        console.log('>>> model=' + JSON.stringify(model));
-
-        Company.findOne({ '_id': team, 'owner': owner, removed: { $exists: false } })
-            .execAsync().then((data) => {
-
-                data.name = request.payload.name;
-                data.description = request.payload.description;
-
-                data.save((err) => {
-
-                    if (!err) {
-                        return reply('Save');
-                    }
-                    console.log(err);
-                    return reply.boom(403, 'Problem');
-                });
-            })
-            .catch((err) => {
-                return reply.badImplementation(err);
-            });
-    }
-};
-
-exports.updateOther = {
-    auth: 'session', tags: ['api', 'settings'], description: 'Edycja other team settings',
-    handler: (request, reply) => {
-
-        return reply.boom(404, 'No implements');
-    }
-};
+module.exports = mongoose.model('Team', schema);

@@ -3,8 +3,8 @@
 const Faker = require('faker');
 Faker.locale = 'pl';
 
-const Project = require('./project/project-model');
-const Team = require('./team/team-model');
+const Project = require('../project/project');
+const Team = require('../team/team');
 
 exports.project = {
 
@@ -16,10 +16,10 @@ exports.project = {
 
         project.save((err, data) => {
 
-            if (!err) {
-                return reply(data);
+            if (err) {
+                return reply.error(err);
             }
-            return reply.badImplementation(err);
+            return reply(data);
         });
     }
 };
@@ -37,10 +37,10 @@ exports.team = {
 
         team.save((err, data) => {
 
-            if (!err) {
-                return reply(data);
+            if (err) {
+                return reply.error(err);
             }
-            return reply.badImplementation(err);
+            return reply(data);
         });
     }
 };

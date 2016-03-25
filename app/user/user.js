@@ -1,166 +1,43 @@
 'use strict';
 
-const Joi = require('joi');
-const User = require('./user-model');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Schema.Types.ObjectId;
 
-exports.login = {
+const schema = mongoose.Schema({
+    email: { type: String, required: true },
+    password: { type: String, required: true },
+    firstName: { type: String, trim: true },
+    lastName: { type: String, trim: true },
+    avatar: { type: String },
 
-    tags: ['api'],
-    description: 'User login',
-    validate: {
-        payload: {
-            email: Joi.string().email().required(),
-            password: Joi.string().required()
-        }
-    },
-    handler: (request, reply) => {
+    created: { type: Date, default: Date.now },
+    updated: { type: Date },
+    removed: { type: Date },
 
-        User.authenticate()(request.payload.email, request.payload.password, (err, user, message) => {
+    role: { type: String, required: true, default: 'USER' },
+    description: { type: String, default: '', trim: true },
+    team: { type: ObjectId, ref: 'Team' },
 
-            console.log(user);
+    settings : {
 
-            if (err) {
-                console.error(err);
-                return reply(err);
-            }
-
-            if (user) {
-                console.log(user);
-
-                const result = {
-                    id: user._id,
-                    email: user.email,
-                    role: user.role.toString(),
-                    company: user.company
-                };
-                request.cookieAuth.set(result); //add user to session
-                return reply(result);
-            }
-            return reply(message);
-
-        });
-    },
-    auth: {
-        mode: 'try', strategy: 'session'
-    },
-    plugins: {
-        'hapi-auth-cookie': {
-            redirectTo: false
-        }
     }
-};
+});
 
-exports.logout = {
+schema.plugin(require('passport-local-mongoose'), {
+    usernameField: 'email',
+    hashField: 'password',
+    usernameLowerCase: true
+});
 
-    tags: ['api'],
-    description: 'User logout',
-    handler: (request, reply) => {
+schema.pre('save', (next) => {
+    this.updated = Date.now();
+    next();
+});
 
-        request.cookieAuth.clear();
-        return reply({ message: 'user logout' });
-    }
-};
+/*
+schema.statics.findOneByUserId = function (userId, select, callback) {
+    this.findOne({ '_id': id, removed: { $exists: false } }, select, null, callback);
+}
+*/
 
-exports.exists = {
-
-    auth: false,
-    handler: (request, reply) => {
-
-        User.findOne({ email: request.params.user }, (err, user) => {
-
-            console.log('(1) user=' + JSON.stringify(user));
-
-            if (err) {
-                reply.boom(500,'Problem to GET user info');
-                return;
-            }
-            if (user === null) {
-                reply({ message: 'The user is not registered in the system' });
-            }
-            else {
-                reply.boom(404, 'The user is already registered in the system');
-            }
-        });
-    }
-};
-
-exports.find = {
-
-    auth: 'session', tags: ['api', 'admin', 'user'], description: 'Users list', notes: 'The return is a list of system users',
-    plugins: { 'hapiAuthorization': { role: 'ADMIN' } },
-    handler: (request, reply) => {
-
-        const owner = request.auth.credentials.id;
-
-        User.find({ /*owner: owner,*/ removed: { $exists: false } }, (err, data) => {
-
-            if (!err) {
-                return reply({ items: data, count: data.length });
-            }
-            return reply.badImplementation(err);
-        });
-    }
-};
-
-exports.get = {
-
-    auth: 'session', tags: ['api', 'settings'], description: 'Get user settings', notes: '...',
-    handler: (request, reply) => {
-
-        const owner = request.auth.credentials.id;
-
-        User.findOne({ '_id': owner, removed: { $exists: false } })
-            .select('_id __v email firstName lastName description settings')
-            .execAsync().then((data) => {
-                return reply(data);
-            })
-            .catch((err) => {
-                return reply.badImplementation(err);
-            });
-    }
-
-};
-
-exports.update = {
-
-    auth: 'session', tags: ['api', 'settings'], description: '...',
-    validate: {
-        payload: {
-            __v: Joi.number().integer().required(),
-            _id: Joi.string().required(),
-            email: Joi.string().email().required(),
-            firstName: Joi.string().description('First name'),
-            lastName: Joi.string().description('Last name'),
-            description: Joi.string().description('Description')
-        }
-    },
-    handler: (request, reply) => {
-
-        const owner = request.auth.credentials.id;
-        const model = request.payload;
-        console.log('>>> model=' + JSON.stringify(model));
-
-        User.findOne({ '_id': owner, removed: { $exists: false } }).execAsync()
-            .then((data) => {
-
-                data.firstName = request.payload.firstName;
-                data.lastName = request.payload.lastName;
-                data.description = request.payload.description;
-
-                data.save((err) => {
-
-                    if (!err) {
-                        return reply('Save');
-                    }
-                    console.log(err);
-                    return reply.boom(403, 'Problem');
-                });
-            })
-            .catch((err) => {
-                return reply.badImplementation(err);
-            });
-    }
-
-};
-
-
+module.exports = mongoose.model('User', schema);
