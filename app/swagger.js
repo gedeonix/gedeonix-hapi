@@ -5,7 +5,7 @@
  * swagger UI - http://localhost:3000/docs
  */
 
-const pgk = require('./../../../package.json');
+const pgk = require('../package.json');
 
 const plugins = [
 

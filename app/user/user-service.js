@@ -211,7 +211,17 @@ exports.update = {
                 return reply.error(err);
             });
     }
-
 };
+
+exports.routes = [
+    { method: 'POST', path: '/api/login', config: exports.login },
+    { method: 'GET', path: '/api/logout', config: exports.logout },
+    { method: 'POST', path: '/api/register', config: exports.register },
+    { method: 'GET', path: '/api/user', config: exports.find },
+    { method: 'GET', path: '/api/user/exists/{email}', config: exports.exists },
+    { method: 'GET', path: '/api/settings/user', config: exports.get },
+    { method: 'PUT', path: '/api/settings/user', config: exports.update }
+];
+
 
 

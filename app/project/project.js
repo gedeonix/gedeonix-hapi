@@ -1,7 +1,7 @@
 'use strict';
 
 const mongoose = require('mongoose');
-const nameValidator = require('../core/validators/name-validator');
+const nameValidator = require('../validators/name');
 
 const schema = mongoose.Schema({
     owner: { type: String, required: true },

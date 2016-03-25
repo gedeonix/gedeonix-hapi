@@ -166,6 +166,13 @@ exports.remove = {
 
 };
 
+exports.routes = [
+    { method: 'GET', path: '/api/project', config: exports.find },
+    { method: 'GET', path: '/api/project/{id}', config: exports.findOne },
+    { method: 'POST', path: '/api/project', config: exports.create },
+    { method: 'PUT', path: '/api/project/{id}', config: exports.update },
+    { method: 'DELETE', path: '/api/project/{id}', config: exports.remove }
+];
 
 
 

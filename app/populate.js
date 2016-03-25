@@ -3,8 +3,8 @@
 const Faker = require('faker');
 Faker.locale = 'pl';
 
-const Project = require('../project/project');
-const Team = require('../team/team');
+const Project = require('./project/project');
+const Team = require('./team/team');
 
 exports.project = {
 
@@ -44,4 +44,11 @@ exports.team = {
         });
     }
 };
+
+//POPULATE - only to test
+exports.routes = [
+    { method: 'GET', path: '/api/populate/team', config: exports.team },
+    { method: 'GET', path: '/api/populate/project', config: exports.project }
+];
+
 

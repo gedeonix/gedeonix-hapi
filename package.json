@@ -11,7 +11,8 @@
   },
   "scripts": {
     "start": "./node_modules/nodemon/bin/nodemon.js",
-    "test": "./node_modules/lab/bin/lab -a code  -L -v",
+    "test": "lab -c",
+    "test-full": "./node_modules/lab/bin/lab -a code  -L -v",
     "test-cov-html": "./node_modules/lab/bin/lab -a code -t 80 -r html -o coverage.html"
   },
   "dependencies": {

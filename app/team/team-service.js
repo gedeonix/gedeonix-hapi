@@ -76,3 +76,10 @@ exports.updateOther = {
         return reply.success();
     }
 };
+
+
+exports.routes = [
+    { method: 'GET', path: '/api/settings/team', config: exports.get },
+    { method: 'PUT', path: '/api/settings/team/main', config: exports.updateMain },
+    { method: 'PUT', path: '/api/settings/team/other', config: exports.updateOther }
+];
